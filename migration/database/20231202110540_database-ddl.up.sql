@@ -63,7 +63,7 @@ CREATE TABLE cities(
 
 CREATE TABLE products(
 	id VARCHAR(30) not null,
-	name varchar(50),
+	name longtext,
 	sub_category_id int,
 	primary key(id),
 	foreign key (sub_category_id) references sub_categories(id) on delete cascade on update cascade
@@ -73,20 +73,28 @@ CREATE TABLE orders(
 	id VARCHAR(20) not NULL,
 	order_date date,
 	ship_date date,
-	sales float,
-	quantity int,
-	discount float,
-	profit float,
 	postal_code int,
 	customer_id VARCHAR(15),
 	ship_mode_id int,
 	city_id int,
 	region_id int,
-	product_id VARCHAR(30),
 	primary key(id),
 	foreign key (customer_id) references customers(id) on delete cascade on update cascade,
 	foreign key (ship_mode_id) references ship_modes(id) on delete cascade on update cascade,
 	foreign key (city_id) references cities(id) on delete cascade on update cascade,
-	foreign key (region_id) references regions(id) on delete cascade on update cascade,
-	foreign key (product_id) references products(id) on delete cascade on update cascade
+	foreign key (region_id) references regions(id) on delete cascade on update cascade
 );
+
+CREATE TABLE order_details(
+	id int not null auto_increment,
+	sales float,
+	quantity int,
+	discount float,
+	profit float,
+	product_id VARCHAR(30),
+	order_id VARCHAR(20) NOT NULL,
+	primary key(id),
+	foreign key (product_id) references products(id) on delete cascade on update cascade,
+	foreign key (order_id) references orders(id) on delete cascade on update cascade
+);
+

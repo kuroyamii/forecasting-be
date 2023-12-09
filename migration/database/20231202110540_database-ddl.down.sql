@@ -1,3 +1,4 @@
+DROP TABLE order_details;
 DROP TABLE orders;
 DROP TABLE customers;
 DROP TABLE products;

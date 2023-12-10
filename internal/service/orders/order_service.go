@@ -1,0 +1,10 @@
+package orderService
+
+import (
+	"context"
+	"forecasting-be/internal/dto"
+)
+
+type OrderService interface {
+	GetOrders(ctx context.Context) (dto.Orders, error)
+}

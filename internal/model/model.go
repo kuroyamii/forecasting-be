@@ -3,14 +3,15 @@ package model
 import "time"
 
 type Order struct {
-	ID         string    `db:"id"`
-	OrderDate  time.Time `db:"order_date"`
-	ShipDate   time.Time `db:"ship_date"`
-	PostalCode int       `db:"postal_code"`
-	Customer   Customer
-	ShipMode   ShipMode
-	City       City
-	Region     Region
+	ID           string    `db:"id"`
+	OrderDate    time.Time `db:"order_date"`
+	ShipDate     time.Time `db:"ship_date"`
+	PostalCode   int       `db:"postal_code"`
+	Customer     Customer
+	ShipMode     ShipMode
+	City         City
+	Region       Region
+	OrderDetails OrderDetails
 }
 
 type OrderDetail struct {
@@ -19,8 +20,11 @@ type OrderDetail struct {
 	Quantity int     `db:"quantity"`
 	Discount float64 `db:"discount"`
 	Profit   float64 `db:"profit"`
+	OrderID  string  `db:"order_id"`
 	Product  Product
 }
+
+type OrderDetails []OrderDetail
 
 type Product struct {
 	ID          string `db:"id"`
@@ -36,9 +40,9 @@ type Category struct {
 type Categories []Category
 
 type SubCategory struct {
-	ID         string `db:"id"`
-	Name       string `db:"name"`
-	CategoryID int    `db:"category_id"`
+	ID       string `db:"id"`
+	Name     string `db:"name"`
+	Category Category
 }
 
 type SubCategories []SubCategory
@@ -49,7 +53,7 @@ type Region struct {
 }
 
 type Regions []Region
-type Orders []Order
+type Orders map[string]Order
 
 type Segment struct {
 	ID   int    `db:"id"`
@@ -59,9 +63,9 @@ type Segment struct {
 type Segments []Segment
 
 type Customer struct {
-	ID        string `db:"db"`
-	Name      string `db:"name"`
-	SegmentID int    `db:"segment_id"`
+	ID      string `db:"db"`
+	Name    string `db:"name"`
+	Segment Segment
 }
 
 type Customers []Customer
@@ -74,9 +78,9 @@ type ShipMode struct {
 type ShipModes []ShipMode
 
 type City struct {
-	ID      int    `db:"id"`
-	Name    string `db:"name"`
-	StateID int    `db:"state_id"`
+	ID    int    `db:"id"`
+	Name  string `db:"name"`
+	State State
 }
 
 type Cities []City
@@ -89,8 +93,9 @@ type Country struct {
 type Countries []Country
 
 type State struct {
-	ID   int    `db:"id"`
-	Name string `db:"name"`
+	ID      int    `db:"id"`
+	Name    string `db:"name"`
+	Country Country
 }
 
 type States []State

@@ -18,7 +18,7 @@ func NewOrderService(or ordersRepository.OrderRepository) orderService {
 	}
 }
 
-func (os orderService) GetOrders(ctx context.Context) (dto.Orders, error) {
+func (os orderService) GetOrders(ctx context.Context, page int64) (dto.Orders, error) {
 	orders, err := os.or.GetOrders(ctx)
 	if err != nil {
 		log.Printf("%v -> %v", utilities.Red("ERROR"), err.Error())
@@ -64,7 +64,6 @@ func (os orderService) GetOrders(ctx context.Context) (dto.Orders, error) {
 			},
 			Region: dto.Region(ord.Region),
 		}
-		ordDetails := dto.OrderDetails{}
 		for _, od := range ord.OrderDetails {
 			var odt dto.OrderDetail
 			odt = dto.OrderDetail{
@@ -83,7 +82,7 @@ func (os orderService) GetOrders(ctx context.Context) (dto.Orders, error) {
 					},
 				},
 			}
-			ordDetails = append(ordDetails, odt)
+			data.OrderDetails = append(data.OrderDetails, odt)
 		}
 		result = append(result, data)
 	}

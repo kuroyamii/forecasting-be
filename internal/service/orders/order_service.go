@@ -6,5 +6,5 @@ import (
 )
 
 type OrderService interface {
-	GetOrders(ctx context.Context) (dto.Orders, error)
+	GetOrders(ctx context.Context, page int64) (dto.Orders, error)
 }

@@ -14,6 +14,17 @@ type Order struct {
 	OrderDetails OrderDetails `json:"order_details"`
 }
 
+type OrderResponse struct {
+	Order    Order    `json:"order"`
+	Metadata Metadata `json:"metadata"`
+}
+
+type Metadata struct {
+	CurrentPage int `json:"current_page"`
+	Pages       int `json:"pages"`
+	Total       int `json:"total"`
+}
+
 type OrderDetail struct {
 	ID       int     `json:"id"`
 	Sales    float64 `json:"sales"`

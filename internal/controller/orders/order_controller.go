@@ -3,7 +3,10 @@ package orderController
 import (
 	orderService "forecasting-be/internal/service/orders"
 	baseResponse "forecasting-be/pkg/response"
+	"forecasting-be/pkg/utilities"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -21,7 +24,13 @@ func NewOrderController(r *mux.Router, os orderService.OrderService) orderContro
 }
 
 func (oc orderController) HandleGetOrders(rw http.ResponseWriter, r *http.Request) {
-	if data, err := oc.os.GetOrders(r.Context()); err != nil {
+	query := r.URL.Query()
+	paginateQuery := query.Get("paginate")
+	page, err := strconv.ParseInt(paginateQuery, 10, 64)
+	if err != nil {
+		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+	}
+	if data, err := oc.os.GetOrders(r.Context(), page); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		baseResponse.NewBaseResponse(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), baseResponse.NewErrorResponses(
 			baseResponse.ErrorResponse{

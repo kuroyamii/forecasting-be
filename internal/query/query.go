@@ -51,3 +51,22 @@ INNER JOIN categories ctg ON sc.category_id = ctg.id;
 // INNER JOIN sub_categories sc ON pd.sub_category_id = sc.id
 // INNER JOIN categories ctg ON sc.category_id = ctg.id;
 // `
+
+const GET_SAME_USERNAME_OR_EMAIL = `
+	select count(*) as jumlah FROM users
+	WHERE username=? OR email=?;
+`
+const INSERT_USER = `
+	INSERT INTO users(id,username, password, email, full_name)
+	VALUES(?,?,?,?,?);
+`
+
+const GET_USER_BY_USERNAME_AND_PASSWORD = `
+	SELECT id, username, email, full_name FROM users
+	WHERE username = ? AND password = ?;
+`
+
+const GET_USER_BY_ID = `
+	SELECT id, username, email, full_name FROM users
+	WHERE id = ?;
+`

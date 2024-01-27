@@ -89,3 +89,49 @@ func (os orderService) GetOrders(ctx context.Context, page int64) (dto.Orders, e
 
 	return result, nil
 }
+
+func (os orderService) GetSalesSum(ctx context.Context, month int) (dto.SalesSums, error) {
+	res, err := os.or.GetSumsOfSales(ctx, month)
+	if err != nil {
+		return nil, err
+	}
+	var result dto.SalesSums
+	for _, item := range res {
+		data := dto.SalesSum{
+			Sum:   item.Sums,
+			Month: item.Month,
+			Year:  item.Year,
+		}
+		result = append(result, data)
+	}
+	return result, err
+}
+
+func (os orderService) GetTotalProduct(ctx context.Context) (int64, error) {
+	res, err := os.or.GetTotalProducts(ctx)
+	return res, err
+}
+
+func (os orderService) GetMostBoughtCategory(ctx context.Context) (string, error) {
+	res, err := os.or.GetMostBoughtCategory(ctx)
+	return res, err
+}
+
+func (os orderService) GetTopTransactions(ctx context.Context, limit int) (dto.TopTransactions, error) {
+	data, err := os.or.GetTopTransactions(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	var res dto.TopTransactions
+	for _, item := range data {
+		transaction := dto.TopTransaction{
+			CustomerID: item.CustomerID,
+			ItemName:   item.ItemName,
+			Date:       item.Date,
+			Sales:      item.Sales,
+		}
+		res = append(res, transaction)
+	}
+	return res, err
+}

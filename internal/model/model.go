@@ -99,3 +99,20 @@ type State struct {
 }
 
 type States []State
+
+type SalesSum struct {
+	Year  int     `db:"year"`
+	Month int     `db:"month"`
+	Sums  float64 `db:"sum"`
+}
+
+type SalesSums []SalesSum
+
+type TopTransaction struct {
+	CustomerID string    `db:"customer_id"`
+	ItemName   string    `db:"product_name"`
+	Date       time.Time `db:"order_date"`
+	Sales      float64   `db:"sales"`
+}
+
+type TopTransactions []TopTransaction

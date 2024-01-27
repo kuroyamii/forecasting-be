@@ -70,3 +70,29 @@ const GET_USER_BY_ID = `
 	SELECT id, username, email, full_name FROM users
 	WHERE id = ?;
 `
+
+const GET_SALES_SUM = `
+select sum(od.sales) as sales,month(o.order_date) as month,year(o.order_date) as year from orders o
+inner join order_details od on od.order_id = o.id
+group by month(o.order_date), year(o.order_date)
+order by year(o.order_date) desc, month(o.order_date) desc
+limit ?;`
+
+const GET_TOTAL_PRODUCT = `
+select count(*) as sum from products;
+`
+const GET_MOST_BOUGHT_CATEGORY = `
+select c.name from order_details od 
+inner join products p on p.id = od.product_id 
+inner join sub_categories sc on sc.id = p.sub_category_id 
+inner join categories c on c.id = sc.category_id
+group by c.name
+order by count(od.id) desc limit 1;`
+
+const GET_TOP_TRANSACTION = `
+select c.id as customer_id, p.name as product_name, o.order_date ,od.sales from order_details od 
+inner join orders o on o.id = od.order_id 
+inner join products p on p.id = od.product_id 
+inner join customers c on c.id = o.customer_id
+order by sales desc
+limit ?;`

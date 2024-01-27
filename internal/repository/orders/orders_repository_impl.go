@@ -58,6 +58,74 @@ func (or orderRepository) GetOrderDetails(ctx context.Context) (model.OrderDetai
 	}
 	return orderDetails, nil
 }
+func (or orderRepository) GetSumsOfSales(ctx context.Context, month int) (model.SalesSums, error) {
+	rows, err := or.db.QueryContext(ctx, query.GET_SALES_SUM, month)
+	if err != nil {
+		log.Printf("%v -> %v\n", utilities.Red("ERROR"), err.Error())
+		return model.SalesSums{}, err
+	}
+
+	var result model.SalesSums
+	for rows.Next() {
+		var row model.SalesSum
+		err = rows.Scan(&row.Sums, &row.Month, &row.Year)
+		if err != nil {
+			log.Printf("%v -> %v\n", utilities.Red("ERROR"), err.Error())
+			return model.SalesSums{}, err
+		}
+		result = append(result, row)
+	}
+
+	return result, err
+}
+func (or orderRepository) GetTotalProducts(ctx context.Context) (int64, error) {
+	rows, err := or.db.QueryContext(ctx, query.GET_TOTAL_PRODUCT)
+	if err != nil {
+		return 0, err
+	}
+	var result int64
+	for rows.Next() {
+		err = rows.Scan(&result)
+		if err != nil {
+			return 0, err
+		}
+	}
+	return result, nil
+}
+func (or orderRepository) GetMostBoughtCategory(ctx context.Context) (string, error) {
+	rows, err := or.db.QueryContext(ctx, query.GET_MOST_BOUGHT_CATEGORY)
+	if err != nil {
+		return "", err
+	}
+
+	var result string
+	for rows.Next() {
+		err = rows.Scan(&result)
+		if err != nil {
+			return "", err
+		}
+	}
+	return result, err
+}
+func (or orderRepository) GetTopTransactions(ctx context.Context, limit int) (model.TopTransactions, error) {
+	rows, err := or.db.QueryContext(ctx, query.GET_TOP_TRANSACTION, limit)
+	if err != nil {
+		return nil, err
+	}
+	var transactions model.TopTransactions
+	for rows.Next() {
+		var transaction model.TopTransaction
+		err = rows.Scan(&transaction.CustomerID, &transaction.ItemName, &transaction.Date, &transaction.Sales)
+		if err != nil {
+			return nil, err
+		}
+		transactions = append(transactions, transaction)
+	}
+	return transactions, nil
+}
+func (or orderRepository) GetProductSummary(ctx context.Context) (model.Products, error) {
+	return nil, nil
+}
 
 func NewOrderRepository(db *sql.DB) orderRepository {
 	return orderRepository{

@@ -46,6 +46,123 @@ func (oc orderController) HandleGetOrders(rw http.ResponseWriter, r *http.Reques
 
 }
 
+func (oc orderController) HandleGetSalesSum(rw http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	salesSumRequest := query.Get("month")
+	month, err := strconv.ParseInt(salesSumRequest, 10, 64)
+	if err != nil {
+		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		baseResponse.NewBaseResponse(http.StatusBadRequest,
+			http.StatusText(http.StatusBadRequest),
+			baseResponse.ErrorResponse{
+				Key:   "parsing error",
+				Value: err.Error(),
+			},
+			nil).ToJSON(rw)
+		return
+	}
+	res, err := oc.os.GetSalesSum(r.Context(), int(month))
+	if err != nil {
+		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		baseResponse.NewBaseResponse(http.StatusBadRequest,
+			http.StatusText(http.StatusBadRequest),
+			baseResponse.ErrorResponse{
+				Key:   "parsing error",
+				Value: err.Error(),
+			},
+			nil).ToJSON(rw)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+	baseResponse.NewBaseResponse(http.StatusOK,
+		http.StatusText(http.StatusOK),
+		nil,
+		res).ToJSON(rw)
+}
+
+func (oc orderController) HandleGetTotalProduct(rw http.ResponseWriter, r *http.Request) {
+	res, err := oc.os.GetTotalProduct(r.Context())
+	if err != nil {
+		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		baseResponse.NewBaseResponse(http.StatusBadRequest,
+			http.StatusText(http.StatusBadRequest),
+			baseResponse.ErrorResponse{
+				Key:   "parsing error",
+				Value: err.Error(),
+			},
+			nil).ToJSON(rw)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+	baseResponse.NewBaseResponse(http.StatusOK,
+		http.StatusText(http.StatusOK),
+		nil,
+		res).ToJSON(rw)
+}
+func (oc orderController) HandleGetMostBoughtCategory(rw http.ResponseWriter, r *http.Request) {
+	res, err := oc.os.GetMostBoughtCategory(r.Context())
+	if err != nil {
+		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		baseResponse.NewBaseResponse(http.StatusBadRequest,
+			http.StatusText(http.StatusBadRequest),
+			baseResponse.ErrorResponse{
+				Key:   "parsing error",
+				Value: err.Error(),
+			},
+			nil).ToJSON(rw)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+	baseResponse.NewBaseResponse(http.StatusOK,
+		http.StatusText(http.StatusOK),
+		nil,
+		res).ToJSON(rw)
+}
+
+func (oc orderController) HandleGetTopTransaction(rw http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	limitString := query.Get("limit")
+	limit, err := strconv.ParseInt(limitString, 10, 64)
+	if err != nil {
+		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		baseResponse.NewBaseResponse(http.StatusBadRequest,
+			http.StatusText(http.StatusBadRequest),
+			baseResponse.ErrorResponse{
+				Key:   "parsing error",
+				Value: err.Error(),
+			},
+			nil).ToJSON(rw)
+		return
+	}
+	res, err := oc.os.GetTopTransactions(r.Context(), int(limit))
+	if err != nil {
+		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		baseResponse.NewBaseResponse(http.StatusBadRequest,
+			http.StatusText(http.StatusInternalServerError),
+			baseResponse.ErrorResponse{
+				Key:   "error",
+				Value: err.Error(),
+			},
+			nil).ToJSON(rw)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+	baseResponse.NewBaseResponse(http.StatusOK,
+		http.StatusText(http.StatusOK),
+		nil,
+		res).ToJSON(rw)
+}
+
 func (oc orderController) InitializeEndpoints() {
 	oc.r.HandleFunc("/orders", oc.HandleGetOrders).Methods("GET")
+	oc.r.HandleFunc("/sales-growth", oc.HandleGetSalesSum).Methods("GET")
+	oc.r.HandleFunc("/total-product", oc.HandleGetTotalProduct).Methods("GET")
+	oc.r.HandleFunc("/most-bought-category", oc.HandleGetMostBoughtCategory).Methods("GET")
+	oc.r.HandleFunc("/top-transactions", oc.HandleGetTopTransaction).Methods("GET")
 }

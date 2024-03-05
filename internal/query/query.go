@@ -57,17 +57,17 @@ const GET_SAME_USERNAME_OR_EMAIL = `
 	WHERE username=? OR email=?;
 `
 const INSERT_USER = `
-	INSERT INTO users(id,username, password, email, full_name)
-	VALUES(?,?,?,?,?);
+	INSERT INTO users(id,username, password, email, first_name, last_name, role_id)
+	VALUES(?,?,?,?,?,?,?);
 `
 
 const GET_USER_BY_USERNAME_AND_PASSWORD = `
-	SELECT id, username, email, full_name FROM users
+	SELECT id, username, email, first_name, last_name, role_id FROM users
 	WHERE username = ? AND password = ?;
 `
 
 const GET_USER_BY_ID = `
-	SELECT id, username, email, full_name FROM users
+	SELECT id, username, email, first_name, last_name, role_id FROM users
 	WHERE id = ?;
 `
 
@@ -96,3 +96,16 @@ inner join products p on p.id = od.product_id
 inner join customers c on c.id = o.customer_id
 order by sales desc
 limit ?;`
+
+const GET_ROLE_ID = `
+SELECT id FROM roles
+WHERE name=?;
+`
+
+const GET_CODE = `
+SELECT code,role_id FROM codes
+WHERE code=? AND email=?;
+`
+
+const INVITE_ADMIN = `
+INSERT INTO codes(email,role_id,code) VALUES (?,?,?);`

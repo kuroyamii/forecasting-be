@@ -2,6 +2,7 @@ package orderController
 
 import (
 	orderService "forecasting-be/internal/service/orders"
+	"forecasting-be/pkg/middlewares"
 	baseResponse "forecasting-be/pkg/response"
 	"forecasting-be/pkg/utilities"
 	"log"
@@ -160,9 +161,11 @@ func (oc orderController) HandleGetTopTransaction(rw http.ResponseWriter, r *htt
 }
 
 func (oc orderController) InitializeEndpoints() {
-	oc.r.HandleFunc("/orders", oc.HandleGetOrders).Methods("GET")
-	oc.r.HandleFunc("/sales-growth", oc.HandleGetSalesSum).Methods("GET")
-	oc.r.HandleFunc("/total-product", oc.HandleGetTotalProduct).Methods("GET")
-	oc.r.HandleFunc("/most-bought-category", oc.HandleGetMostBoughtCategory).Methods("GET")
-	oc.r.HandleFunc("/top-transactions", oc.HandleGetTopTransaction).Methods("GET")
+	adminRouter := oc.r.PathPrefix("").Subrouter()
+	adminRouter.Use(middlewares.ValidateAdminJWT)
+	adminRouter.HandleFunc("/orders", oc.HandleGetOrders).Methods("GET")
+	adminRouter.HandleFunc("/sales-growth", oc.HandleGetSalesSum).Methods("GET")
+	adminRouter.HandleFunc("/total-product", oc.HandleGetTotalProduct).Methods("GET")
+	adminRouter.HandleFunc("/most-bought-category", oc.HandleGetMostBoughtCategory).Methods("GET")
+	adminRouter.HandleFunc("/top-transactions", oc.HandleGetTopTransaction).Methods("GET")
 }

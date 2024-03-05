@@ -1,9 +1,14 @@
 package middlewares
 
 import (
+	"errors"
 	"forecasting-be/pkg/utilities"
 	"log"
 	"net/http"
+	"os"
+	"strings"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 func ContentTypeJSON(handler http.Handler) http.Handler {
@@ -38,5 +43,84 @@ func LoggerMiddleware(handler http.Handler) http.Handler {
 		}
 		log.Printf("%v %v", method, Origin)
 		handler.ServeHTTP(rw, r)
+	})
+}
+
+func ValidateAdminJWT(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "" {
+			authorization := r.Header.Get("Authorization")
+			auth := strings.Split(authorization, " ")[1]
+			claims := jwt.MapClaims{}
+			token, err := jwt.ParseWithClaims(auth, claims, func(t *jwt.Token) (interface{}, error) {
+				_, ok := t.Method.(*jwt.SigningMethodHMAC)
+				if !ok {
+					return nil, errors.New("unauthorized")
+				}
+				jwtKey := os.Getenv("JWT_KEY")
+				return []byte(jwtKey), nil
+			})
+			if err != nil {
+				rw.WriteHeader(http.StatusForbidden)
+				return
+			}
+
+			if token.Valid {
+				data := claims["data"].(map[string]interface{})
+				parsedRoleID := int(data["role_id"].(float64))
+				if parsedRoleID == 1 || parsedRoleID == 2 {
+					handler.ServeHTTP(rw, r)
+					return
+				} else {
+					rw.WriteHeader(http.StatusForbidden)
+					return
+
+				}
+			}
+		} else {
+			rw.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+	})
+}
+
+func ValidateSuperAdminJWT(handler http.Handler) http.Handler {
+	log.Println("middleware in")
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "" {
+			authorization := r.Header.Get("Authorization")
+			auth := strings.Split(authorization, " ")[1]
+			claims := jwt.MapClaims{}
+			token, err := jwt.ParseWithClaims(auth, claims, func(t *jwt.Token) (interface{}, error) {
+				_, ok := t.Method.(*jwt.SigningMethodHMAC)
+				if !ok {
+					return nil, errors.New("unauthorized")
+				}
+				jwtKey := os.Getenv("JWT_KEY")
+				return []byte(jwtKey), nil
+			})
+			if err != nil {
+				rw.WriteHeader(http.StatusForbidden)
+				return
+			}
+
+			if token.Valid {
+				data := claims["data"].(map[string]interface{})
+				parsedRoleID := int(data["role_id"].(float64))
+				if parsedRoleID == 2 {
+					handler.ServeHTTP(rw, r)
+					return
+				} else {
+					rw.WriteHeader(http.StatusForbidden)
+					return
+
+				}
+			}
+		} else {
+			rw.WriteHeader(http.StatusForbidden)
+			return
+		}
+
 	})
 }

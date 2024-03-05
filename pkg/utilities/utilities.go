@@ -14,6 +14,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/xlzd/gotp"
 )
 
 var (
@@ -127,4 +128,16 @@ func GetDataFromRefreshToken(rt string) (uuid.UUID, time.Time, error) {
 		return idConv, res, nil
 	}
 	return uuid.UUID{}, time.Time{}, errors.New("token invalid")
+}
+
+func GenerateOTP(otpLengthStr string) string {
+	// otpLengthStr := os.Getenv("OTP_LENGTH")
+	otpLength, err := strconv.ParseInt(otpLengthStr, 10, 64)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	length := int(otpLength)
+	str := gotp.RandomSecret(length)
+	str = str[:otpLength]
+	return str
 }

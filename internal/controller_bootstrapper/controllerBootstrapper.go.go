@@ -10,11 +10,12 @@ import (
 	authService "forecasting-be/internal/service/auth"
 	orderService "forecasting-be/internal/service/orders"
 	pingService "forecasting-be/internal/service/ping"
+	"forecasting-be/pkg/utilities"
 
 	"github.com/gorilla/mux"
 )
 
-func InitializeEndpoints(router *mux.Router, db *sql.DB) {
+func InitializeEndpoints(router *mux.Router, db *sql.DB, smtpConfig utilities.SMTPConfig) {
 	pingService := pingService.NewPingService()
 
 	pingController := pingController.NewPingController(router, pingService)
@@ -26,7 +27,7 @@ func InitializeEndpoints(router *mux.Router, db *sql.DB) {
 	orderController.InitializeEndpoints()
 
 	authRepository := authRepository.NewAuthRepository(db)
-	authService := authService.NewAuthService(authRepository)
+	authService := authService.NewAuthService(authRepository, smtpConfig)
 	authController := authController.NewAuthController(router, authService)
 	authController.InitializeEndpoints()
 

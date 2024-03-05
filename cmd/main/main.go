@@ -47,9 +47,10 @@ func main() {
 	}
 
 	environmentVariables := getEnvironmentVariables()
+	smtpConfigs := utilities.GetSMTPConfig()
 	db := utilities.GetDatabase(environmentVariables["DB_ADDRESS"], environmentVariables["DB_UNAME"], environmentVariables["DB_PASSWORD"], environmentVariables["DB_NAME"])
 	router := initializeGlobalRouter(environmentVariables)
-	controllerBootstrapper.InitializeEndpoints(router, db)
+	controllerBootstrapper.InitializeEndpoints(router, db, smtpConfigs)
 	server := server.NewServer(":8080", router)
 	server.ListenAndServe()
 }

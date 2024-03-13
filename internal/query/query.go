@@ -109,3 +109,34 @@ WHERE code=? AND email=?;
 
 const INVITE_ADMIN = `
 INSERT INTO codes(email,role_id,code) VALUES (?,?,?);`
+
+const GET_SALES_DATA = `
+SELECT * FROM (
+	select month(o.order_date) as 'Order Month', year(o.order_date) as 'Order Year', p.numeric_id as 'Product ID', sum(od.sales) as Sales  from orders o
+	inner join order_details od on od.order_id = o.id 
+	inner join products p on p.id = od.product_id
+	group by p.numeric_id,year(o.order_date) , month(o.order_date)
+	) as query
+	where query.` + "`Order Month`" + ` = ? and query.` + "`Order Year`" + ` = ? and query.` + "`Product ID`" + ` = ?
+	order by query.` + "`Order Month`" + `;
+`
+const GET_PRODUCT_BY_ID = `
+	SELECT p.id, p.name, p.numeric_id, p.sub_category_id, sc.name ,c.id ,c.name  FROM products p
+	INNER join sub_categories sc ON sc.id = p.sub_category_id 
+	INNER join categories c ON c.id = sc.category_id 
+	WHERE numeric_id = ?;
+`
+const GET_PRODUCT_SUMMARY = `
+	SELECT
+	count(*) OVER(),
+	pd.id, pd.name,
+	sc.name,
+	ctg.name,
+	sum(od.sales) as total_sales
+	FROM order_details od
+	INNER JOIN products pd ON od.product_id = pd.id
+	INNER JOIN sub_categories sc ON pd.sub_category_id = sc.id
+	INNER JOIN categories ctg ON sc.category_id = ctg.id
+	group by product_id
+	LIMIT ? OFFSET ?;
+`

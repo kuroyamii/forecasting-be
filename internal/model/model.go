@@ -29,6 +29,7 @@ type OrderDetails []OrderDetail
 type Product struct {
 	ID          string `db:"id"`
 	Name        string `db:"name"`
+	NumericID   int    `db:"numeric_id"`
 	SubCategory SubCategory
 }
 type Products []Product
@@ -116,3 +117,13 @@ type TopTransaction struct {
 }
 
 type TopTransactions []TopTransaction
+
+type ProductSummary struct {
+	ProductID   string  `db:"id"`
+	ProductName string  `db:"product_name"`
+	SubCategory string  `db:"sub_category"`
+	Category    string  `db:"category"`
+	TotalSales  float64 `db:"total_sales"`
+}
+
+type ProductSummaries []ProductSummary

@@ -109,3 +109,18 @@ type State struct {
 }
 
 type States []State
+
+type ProductSummary struct {
+	ProductID   string  `json:"id"`
+	ProductName string  `json:"product_name"`
+	SubCategory string  `json:"sub_category"`
+	Category    string  `json:"category"`
+	TotalSales  float64 `json:"total_sales"`
+}
+
+type ProductSummariesResponse struct {
+	Metadata Metadata         `json:"metadata"`
+	Data     ProductSummaries `json:"data"`
+}
+
+type ProductSummaries []ProductSummary

@@ -43,9 +43,6 @@ func (pr productRepository) GetProductSummary(ctx context.Context, limit int, of
 	var total int
 	var results model.ProductSummaries
 
-	if !rows.Next() {
-		return nil, 0, errors.New("beyond the boundary")
-	}
 	for rows.Next() {
 		var result model.ProductSummary
 		err = rows.Scan(&total, &result.ProductID, &result.ProductName, &result.SubCategory, &result.Category, &result.TotalSales)
@@ -54,5 +51,27 @@ func (pr productRepository) GetProductSummary(ctx context.Context, limit int, of
 		}
 		results = append(results, result)
 	}
+	if len(results) == 0 {
+		return nil, 0, errors.New("beyond the boundary")
+	}
 	return results, total, nil
+}
+
+func (pr productRepository) GetProducts(ctx context.Context) (model.Products, error) {
+	rows, err := pr.db.QueryContext(ctx, query.GET_PRODUCTS)
+	if err != nil {
+		return nil, err
+	}
+	var result model.Products
+	for rows.Next() {
+		var item model.Product
+		err = rows.Scan(&item.NumericID, &item.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, item)
+	}
+
+	return result, nil
 }

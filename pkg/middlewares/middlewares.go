@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/gorilla/mux"
 )
 
 func ContentTypeJSON(handler http.Handler) http.Handler {
@@ -47,6 +48,7 @@ func LoggerMiddleware(handler http.Handler) http.Handler {
 }
 
 func ValidateAdminJWT(handler http.Handler) http.Handler {
+
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "" {
 			authorization := r.Header.Get("Authorization")
@@ -86,7 +88,6 @@ func ValidateAdminJWT(handler http.Handler) http.Handler {
 }
 
 func ValidateSuperAdminJWT(handler http.Handler) http.Handler {
-	log.Println("middleware in")
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "" {
 			authorization := r.Header.Get("Authorization")
@@ -123,4 +124,25 @@ func ValidateSuperAdminJWT(handler http.Handler) http.Handler {
 		}
 
 	})
+}
+
+func CORSMiddleware(whitelistedUrls map[string]bool) mux.MiddlewareFunc {
+	return func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+			rw.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE, PATCH")
+			rw.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token, Authorization")
+			rw.Header().Set("Access-Control-Allow-Credentials", "true")
+
+			requestOriginUrl := r.Header.Get("Origin")
+			log.Printf("%v CorsMiddleware: received request from %v", utilities.Info("INFO"), requestOriginUrl)
+			if whitelistedUrls[requestOriginUrl] {
+				rw.Header().Set("Access-Control-Allow-Origin", requestOriginUrl)
+
+			}
+			if r.Method != http.MethodOptions {
+				handler.ServeHTTP(rw, r)
+				return
+			}
+		})
+	}
 }

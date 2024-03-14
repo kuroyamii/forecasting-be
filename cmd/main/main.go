@@ -8,6 +8,7 @@ import (
 	"forecasting-be/pkg/utilities"
 	"log"
 	"os"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -18,6 +19,12 @@ import (
 func initializeGlobalRouter(envVars map[string]string) *mux.Router {
 	router := mux.NewRouter()
 
+	whitelistedURLStrings := strings.Split(envVars["WHITELISTED_URLS"], ",")
+	whitelistedUrls := make(map[string]bool)
+	for _, item := range whitelistedURLStrings {
+		whitelistedUrls[item] = true
+	}
+	router.Use(middlewares.CORSMiddleware(whitelistedUrls))
 	router.Use(middlewares.ContentTypeJSON)
 	router.Use(middlewares.LoggerMiddleware)
 

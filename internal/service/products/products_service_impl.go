@@ -16,6 +16,23 @@ func NewProductService(pr productRepository.ProductRepository) productService {
 	}
 }
 
+func (ps productService) GetProducts(ctx context.Context) (dto.SimpleProducts, error) {
+	data, err := ps.pr.GetProducts(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var result dto.SimpleProducts
+	for _, item := range data {
+		singleResult := dto.SimpleProduct{
+			ID:   item.NumericID,
+			Name: item.Name,
+		}
+		result = append(result, singleResult)
+	}
+	return result, nil
+}
+
 func (ps productService) GetProductSummary(ctx context.Context, page int, limit int) (dto.ProductSummariesResponse, error) {
 	if limit <= 0 {
 		limit = 10
@@ -24,6 +41,7 @@ func (ps productService) GetProductSummary(ctx context.Context, page int, limit 
 		page = 1
 	}
 	offset := limit*(page-1) + 1
+
 	data, total, err := ps.pr.GetProductSummary(ctx, limit, offset)
 	totalPages := total / limit
 	if err != nil {

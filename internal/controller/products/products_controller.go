@@ -27,7 +27,8 @@ func NewProductController(r *mux.Router, ps productService.ProductService) produ
 func (pc productController) InitializeEndpoints() {
 	adminRouter := pc.r.NewRoute().Subrouter()
 	adminRouter.Use(middlewares.ValidateAdminJWT)
-	adminRouter.HandleFunc("/product-summaries", pc.handleProductSummary).Methods("GET")
+	adminRouter.HandleFunc("/product-summaries", pc.handleProductSummary).Methods("GET", "OPTIONS")
+	adminRouter.HandleFunc("/products", pc.handleGetAllProducts).Methods("GET", "OPTIONS")
 }
 
 func (pc productController) handleProductSummary(rw http.ResponseWriter, r *http.Request) {
@@ -42,8 +43,28 @@ func (pc productController) handleProductSummary(rw http.ResponseWriter, r *http
 	if err != nil {
 		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
 	}
-
 	res, err := pc.ps.GetProductSummary(r.Context(), int(page), int(limit))
+	if err != nil {
+		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+		rw.WriteHeader(http.StatusBadRequest)
+		baseResponse.NewBaseResponse(http.StatusBadRequest,
+			http.StatusText(http.StatusBadRequest),
+			baseResponse.ErrorResponse{
+				Key:   "parsing error",
+				Value: err.Error(),
+			},
+			nil).ToJSON(rw)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+	baseResponse.NewBaseResponse(http.StatusOK,
+		http.StatusText(http.StatusOK),
+		nil,
+		res).ToJSON(rw)
+}
+
+func (pc productController) handleGetAllProducts(rw http.ResponseWriter, r *http.Request) {
+	res, err := pc.ps.GetProducts(r.Context())
 	if err != nil {
 		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
 		rw.WriteHeader(http.StatusBadRequest)

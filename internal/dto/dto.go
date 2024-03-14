@@ -43,6 +43,13 @@ type Product struct {
 }
 type Products []Product
 
+type SimpleProduct struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type SimpleProducts []SimpleProduct
+
 type Category struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`

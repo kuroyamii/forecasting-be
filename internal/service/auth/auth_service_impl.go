@@ -115,17 +115,14 @@ func (as authService) SignUp(ctx context.Context, userRequest dto.RegisterReques
 }
 
 func (as authService) RegenerateToken(ctx context.Context, rt string) (dto.SignInResponse, error) {
-	// Get token env
-	tokenEnv := utilities.GetTokenEnv()
 	// Get data from refresh token
-	id, created_at, err := utilities.GetDataFromRefreshToken(rt)
+	id, exp, err := utilities.GetDataFromRefreshToken(rt)
 	if err != nil {
 		return dto.SignInResponse{}, err
 	}
-	interval := time.Since(created_at)
 
 	// If the refresh token is expired, return error. If not, proceed
-	if interval.Hours() > float64(tokenEnv.RefreshTokenTTLHour) {
+	if exp.Before(time.Now()) {
 		return dto.SignInResponse{}, errors.New("refresh token invalid")
 	}
 

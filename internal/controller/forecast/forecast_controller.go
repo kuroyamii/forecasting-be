@@ -28,7 +28,7 @@ func NewForecastController(router *mux.Router, fs forecastService.ForecastServie
 func (fc forecastController) InitializeEndpoints() {
 	adminRouter := fc.r.PathPrefix("").Subrouter()
 	adminRouter.Use(middlewares.ValidateAdminJWT)
-	adminRouter.HandleFunc("/forecast", fc.handleForecast).Methods("POST")
+	adminRouter.HandleFunc("/forecast", fc.handleForecast).Methods("POST", "OPTIONS")
 }
 
 func (fc forecastController) handleForecast(rw http.ResponseWriter, r *http.Request) {

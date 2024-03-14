@@ -26,13 +26,13 @@ func NewAuthController(router *mux.Router, as authService.AuthService) authContr
 }
 
 func (ac authController) InitializeEndpoints() {
-	ac.router.HandleFunc("/signup", ac.handleSignUp).Methods("POST")
-	ac.router.HandleFunc("/signin", ac.handleSignIn).Methods("POST")
-	ac.router.HandleFunc("/token/refresh", ac.handleRefreshToken).Methods("POST")
+	ac.router.HandleFunc("/signup", ac.handleSignUp).Methods("POST", "OPTIONS")
+	ac.router.HandleFunc("/signin", ac.handleSignIn).Methods("POST", "OPTIONS")
+	ac.router.HandleFunc("/token/refresh", ac.handleRefreshToken).Methods("POST", "OPTIONS")
 
 	adminSubRouter := ac.router.PathPrefix("/admin").Subrouter()
 	adminSubRouter.Use(middlewares.ValidateSuperAdminJWT)
-	adminSubRouter.HandleFunc("/invite", ac.handleInviteAdmin).Methods("POST")
+	adminSubRouter.HandleFunc("/invite", ac.handleInviteAdmin).Methods("POST", "OPTIONS")
 }
 
 // handleInviteAdmin is for inviting admin so the admin can do signup
@@ -191,9 +191,15 @@ func (ac authController) handleSignIn(rw http.ResponseWriter, r *http.Request) {
 	res, err := ac.as.SignIn(r.Context(), loginRequest.Username, loginRequest.Password)
 	if err != nil {
 		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
-		rw.WriteHeader(http.StatusInternalServerError)
-		baseResponse.NewBaseResponse(http.StatusInternalServerError,
-			http.StatusText(http.StatusInternalServerError),
+		var statusCode int
+		if err.Error() == "unauthorized" {
+			statusCode = http.StatusUnauthorized
+		} else {
+			statusCode = http.StatusInternalServerError
+		}
+		rw.WriteHeader(statusCode)
+		baseResponse.NewBaseResponse(statusCode,
+			http.StatusText(statusCode),
 			baseResponse.ErrorResponse{
 				Key:   "internal server error",
 				Value: err.Error(),

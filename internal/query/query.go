@@ -140,3 +140,7 @@ const GET_PRODUCT_SUMMARY = `
 	group by product_id
 	LIMIT ? OFFSET ?;
 `
+
+const GET_PRODUCTS = `
+	SELECT numeric_id, name FROM products;
+`

@@ -68,6 +68,8 @@ func CreateLoginToken(userID uuid.UUID, data interface{}) (string, string) {
 	claims["sub"] = userID
 	claims["data"] = data
 	claims["created_at"] = time.Now()
+	tokenEnv := GetTokenEnv()
+	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenEnv.AccessTokenTTLHour)).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	accessToken, _ := token.SignedString([]byte(GetJWTKey()))
@@ -75,6 +77,7 @@ func CreateLoginToken(userID uuid.UUID, data interface{}) (string, string) {
 	claims = jwt.MapClaims{}
 	claims["sub"] = userID
 	claims["created_at"] = time.Now()
+	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenEnv.RefreshTokenTTLHour)).Unix()
 	rtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	refreshToken, _ := rtoken.SignedString([]byte(GetJWTKey()))
@@ -110,14 +113,16 @@ func GetDataFromRefreshToken(rt string) (uuid.UUID, time.Time, error) {
 	if err != nil {
 		return uuid.UUID{}, time.Time{}, err
 	}
-
 	if token.Valid {
-		res, err := time.Parse(time.RFC3339, claims["created_at"].(string))
-		if err != nil {
-			return uuid.UUID{}, time.Time{}, err
+		var res time.Time
+		switch exp := claims["exp"].(type) {
+		case float64:
+			res = time.Unix(int64(exp), 0)
+		case json.Number:
+			v, _ := exp.Int64()
+			res = time.Unix(v, 0)
 		}
-		env := GetTokenEnv()
-		if time.Now().Sub(res).Hours() > float64(env.RefreshTokenTTLHour) {
+		if res.Before(time.Now()) {
 			return uuid.UUID{}, time.Time{}, errors.New("token expired")
 		}
 		idStr := fmt.Sprintf("%v", claims["sub"])

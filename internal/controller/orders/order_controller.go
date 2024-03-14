@@ -163,9 +163,9 @@ func (oc orderController) HandleGetTopTransaction(rw http.ResponseWriter, r *htt
 func (oc orderController) InitializeEndpoints() {
 	adminRouter := oc.r.PathPrefix("").Subrouter()
 	adminRouter.Use(middlewares.ValidateAdminJWT)
-	adminRouter.HandleFunc("/orders", oc.HandleGetOrders).Methods("GET")
-	adminRouter.HandleFunc("/sales-growth", oc.HandleGetSalesSum).Methods("GET")
-	adminRouter.HandleFunc("/total-product", oc.HandleGetTotalProduct).Methods("GET")
-	adminRouter.HandleFunc("/most-bought-category", oc.HandleGetMostBoughtCategory).Methods("GET")
-	adminRouter.HandleFunc("/top-transactions", oc.HandleGetTopTransaction).Methods("GET")
+	adminRouter.HandleFunc("/orders", oc.HandleGetOrders).Methods("GET", "OPTIONS")
+	adminRouter.HandleFunc("/sales-growth", oc.HandleGetSalesSum).Methods("GET", "OPTIONS")
+	adminRouter.HandleFunc("/total-product", oc.HandleGetTotalProduct).Methods("GET", "OPTIONS")
+	adminRouter.HandleFunc("/most-bought-category", oc.HandleGetMostBoughtCategory).Methods("GET", "OPTIONS")
+	adminRouter.HandleFunc("/top-transactions", oc.HandleGetTopTransaction).Methods("GET", "OPTIONS")
 }

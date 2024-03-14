@@ -32,5 +32,5 @@ func NewPingController(router *mux.Router, ps pingService.PingServiceImpl) PingC
 }
 
 func (pc PingController) InitEndpoints() {
-	pc.router.HandleFunc("/ping", pc.HandleGetPing).Methods("GET")
+	pc.router.HandleFunc("/ping", pc.HandleGetPing).Methods("GET", "OPTIONS")
 }

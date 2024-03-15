@@ -10,3 +10,7 @@ DROP TABLE regions;
 DROP TABLE segments;
 DROP TABLE categories;
 DROP TABLE countries;
+
+DROP TABLE users;
+DROP TABLE codes;
+DROP TABLE roles;

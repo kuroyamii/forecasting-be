@@ -21,13 +21,13 @@ func NewForecastService(pr productRepository.ProductRepository) forecastService 
 	}
 }
 
-func (fs forecastService) ForecastSales(ctx context.Context, month int, year int, productID int) (dto.ForecastResult, error) {
+func (fs forecastService) ForecastSales(ctx context.Context, month int, year int, subCategoryId int, discount float64) (dto.ForecastResult, error) {
 
 	if month <= 0 || month > 12 {
 		return dto.ForecastResult{}, errors.New("out of boundary")
 	}
 
-	_, err := fs.pr.GetProductByID(ctx, productID)
+	data, err := fs.pr.GetSubCategoryByID(ctx, subCategoryId)
 	if err != nil {
 		return dto.ForecastResult{}, err
 	}
@@ -35,13 +35,14 @@ func (fs forecastService) ForecastSales(ctx context.Context, month int, year int
 	body := fmt.Sprintf(`{
 	"month":%v,
 	"year":%v,
-	"product_id":%v
+	"sub_category":"%v",
+	"discount":%v
 	}
-	`, month, year, productID)
+	`, month, year, data.Name, discount)
 	forecastAPIURL := os.Getenv("FORECAST_API_ADDRESS")
 	jsonBody := []byte(body)
 	res, err := http.Post(forecastAPIURL, "application/json", bytes.NewBuffer(jsonBody))
-	if err != nil {
+	if err != nil || res.StatusCode >= 300 {
 		return dto.ForecastResult{}, err
 	}
 	result := dto.ForecastResponseFromFlask{}

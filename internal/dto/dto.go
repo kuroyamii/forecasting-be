@@ -43,21 +43,21 @@ type Product struct {
 }
 type Products []Product
 
-type SimpleProduct struct {
+type SimpleSubCategory struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
-type SimpleProducts []SimpleProduct
+type SimpleSubCategories []SimpleSubCategory
 
 type Category struct {
-	ID   string `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 type Categories []Category
 
 type SubCategory struct {
-	ID       string   `json:"id"`
+	ID       int      `json:"id"`
 	Name     string   `json:"name"`
 	Category Category `json:"category"`
 }

@@ -120,11 +120,10 @@ SELECT * FROM (
 	where query.` + "`Order Month`" + ` = ? and query.` + "`Order Year`" + ` = ? and query.` + "`Product ID`" + ` = ?
 	order by query.` + "`Order Month`" + `;
 `
-const GET_PRODUCT_BY_ID = `
-	SELECT p.id, p.name, p.numeric_id, p.sub_category_id, sc.name ,c.id ,c.name  FROM products p
-	INNER join sub_categories sc ON sc.id = p.sub_category_id 
+const GET_SUB_CATEGORY_BY_ID = `
+	SELECT sc.id, sc.name ,c.id ,c.name  FROM sub_categories sc
 	INNER join categories c ON c.id = sc.category_id 
-	WHERE numeric_id = ?;
+	WHERE sc.id = ?;
 `
 const GET_PRODUCT_SUMMARY = `
 	SELECT
@@ -141,6 +140,6 @@ const GET_PRODUCT_SUMMARY = `
 	LIMIT ? OFFSET ?;
 `
 
-const GET_PRODUCTS = `
-	SELECT numeric_id, name FROM products;
+const GET_SUB_CATEGORY = `
+	SELECT id, name FROM sub_categories;
 `

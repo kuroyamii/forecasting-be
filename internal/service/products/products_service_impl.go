@@ -16,16 +16,16 @@ func NewProductService(pr productRepository.ProductRepository) productService {
 	}
 }
 
-func (ps productService) GetProducts(ctx context.Context) (dto.SimpleProducts, error) {
-	data, err := ps.pr.GetProducts(ctx)
+func (ps productService) GetSubCategories(ctx context.Context) (dto.SimpleSubCategories, error) {
+	data, err := ps.pr.GetSubCategories(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var result dto.SimpleProducts
+	var result dto.SimpleSubCategories
 	for _, item := range data {
-		singleResult := dto.SimpleProduct{
-			ID:   item.NumericID,
+		singleResult := dto.SimpleSubCategory{
+			ID:   item.ID,
 			Name: item.Name,
 		}
 		result = append(result, singleResult)

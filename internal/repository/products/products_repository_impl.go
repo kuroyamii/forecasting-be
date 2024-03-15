@@ -18,21 +18,21 @@ func NewProductRepository(db *sql.DB) productRepository {
 	}
 }
 
-func (pr productRepository) GetProductByID(ctx context.Context, productID int) (model.Product, error) {
-	rows, err := pr.db.QueryContext(ctx, query.GET_PRODUCT_BY_ID, productID)
+func (pr productRepository) GetSubCategoryByID(ctx context.Context, subCategoryId int) (model.SubCategory, error) {
+	rows, err := pr.db.QueryContext(ctx, query.GET_SUB_CATEGORY_BY_ID, subCategoryId)
 	if err != nil {
-		return model.Product{}, err
+		return model.SubCategory{}, err
 	}
 
-	var result model.Product
+	var result model.SubCategory
 	if rows.Next() {
-		err = rows.Scan(&result.ID, &result.Name, &result.NumericID, &result.SubCategory.ID, &result.SubCategory.Name, &result.SubCategory.Category.ID, &result.SubCategory.Category.Name)
+		err = rows.Scan(&result.ID, &result.Name, &result.Category.ID, &result.Category.Name)
 		if err != nil {
-			return model.Product{}, err
+			return model.SubCategory{}, err
 		}
 		return result, nil
 	}
-	return model.Product{}, errors.New("product not found")
+	return model.SubCategory{}, errors.New("product not found")
 }
 
 func (pr productRepository) GetProductSummary(ctx context.Context, limit int, offset int) (model.ProductSummaries, int, error) {
@@ -57,15 +57,15 @@ func (pr productRepository) GetProductSummary(ctx context.Context, limit int, of
 	return results, total, nil
 }
 
-func (pr productRepository) GetProducts(ctx context.Context) (model.Products, error) {
-	rows, err := pr.db.QueryContext(ctx, query.GET_PRODUCTS)
+func (pr productRepository) GetSubCategories(ctx context.Context) (model.SubCategories, error) {
+	rows, err := pr.db.QueryContext(ctx, query.GET_SUB_CATEGORY)
 	if err != nil {
 		return nil, err
 	}
-	var result model.Products
+	var result model.SubCategories
 	for rows.Next() {
-		var item model.Product
-		err = rows.Scan(&item.NumericID, &item.Name)
+		var item model.SubCategory
+		err = rows.Scan(&item.ID, &item.Name)
 		if err != nil {
 			return nil, err
 		}

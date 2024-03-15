@@ -29,19 +29,18 @@ type OrderDetails []OrderDetail
 type Product struct {
 	ID          string `db:"id"`
 	Name        string `db:"name"`
-	NumericID   int    `db:"numeric_id"`
 	SubCategory SubCategory
 }
 type Products []Product
 
 type Category struct {
-	ID   string `db:"id"`
+	ID   int    `db:"id"`
 	Name string `db:"name"`
 }
 type Categories []Category
 
 type SubCategory struct {
-	ID       string `db:"id"`
+	ID       int    `db:"id"`
 	Name     string `db:"name"`
 	Category Category
 }

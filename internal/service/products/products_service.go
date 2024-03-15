@@ -7,5 +7,5 @@ import (
 
 type ProductService interface {
 	GetProductSummary(ctx context.Context, page int, limit int) (dto.ProductSummariesResponse, error)
-	GetProducts(ctx context.Context) (dto.SimpleProducts, error)
+	GetSubCategories(ctx context.Context) (dto.SimpleSubCategories, error)
 }

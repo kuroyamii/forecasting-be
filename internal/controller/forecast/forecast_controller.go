@@ -67,7 +67,7 @@ func (fc forecastController) handleForecast(rw http.ResponseWriter, r *http.Requ
 	}
 
 	// Forecast sales
-	res, err := fc.fs.ForecastSales(r.Context(), forecastRequest.Month, forecastRequest.Year, forecastRequest.ProductID)
+	res, err := fc.fs.ForecastSales(r.Context(), forecastRequest.Month, forecastRequest.Year, forecastRequest.SubCategoryID, forecastRequest.Discount)
 	if err != nil {
 		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)

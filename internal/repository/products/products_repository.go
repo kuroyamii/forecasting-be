@@ -6,7 +6,7 @@ import (
 )
 
 type ProductRepository interface {
-	GetProductByID(ctx context.Context, productID int) (model.Product, error)
+	GetSubCategoryByID(ctx context.Context, subCategoryId int) (model.SubCategory, error)
 	GetProductSummary(ctx context.Context, limit int, offset int) (model.ProductSummaries, int, error)
-	GetProducts(ctx context.Context) (model.Products, error)
+	GetSubCategories(ctx context.Context) (model.SubCategories, error)
 }

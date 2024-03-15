@@ -28,7 +28,7 @@ func (pc productController) InitializeEndpoints() {
 	adminRouter := pc.r.NewRoute().Subrouter()
 	adminRouter.Use(middlewares.ValidateAdminJWT)
 	adminRouter.HandleFunc("/product-summaries", pc.handleProductSummary).Methods("GET", "OPTIONS")
-	adminRouter.HandleFunc("/products", pc.handleGetAllProducts).Methods("GET", "OPTIONS")
+	adminRouter.HandleFunc("/sub-categories", pc.handleGetAllSubCategories).Methods("GET", "OPTIONS")
 }
 
 func (pc productController) handleProductSummary(rw http.ResponseWriter, r *http.Request) {
@@ -63,8 +63,8 @@ func (pc productController) handleProductSummary(rw http.ResponseWriter, r *http
 		res).ToJSON(rw)
 }
 
-func (pc productController) handleGetAllProducts(rw http.ResponseWriter, r *http.Request) {
-	res, err := pc.ps.GetProducts(r.Context())
+func (pc productController) handleGetAllSubCategories(rw http.ResponseWriter, r *http.Request) {
+	res, err := pc.ps.GetSubCategories(r.Context())
 	if err != nil {
 		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
 		rw.WriteHeader(http.StatusBadRequest)

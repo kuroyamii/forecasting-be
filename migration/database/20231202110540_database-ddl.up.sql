@@ -65,9 +65,7 @@ CREATE TABLE products(
 	id VARCHAR(30) not null,
 	name longtext,
 	sub_category_id int,
-	numeric_id int not null auto_increment,
 	primary key(id),
-	key (numeric_id),
 	foreign key (sub_category_id) references sub_categories(id) on delete cascade on update cascade
 );
 

@@ -17,9 +17,10 @@ type ResponseForecast struct {
 }
 
 type ForecastRequest struct {
-	Month     int `json:"month" validate:"required"`
-	Year      int `json:"year" validate:"required"`
-	ProductID int `json:"product_id" validate:"required"`
+	Month         int     `json:"month" validate:"required"`
+	Year          int     `json:"year" validate:"required"`
+	Discount      float64 `json:"discount" validate:"required"`
+	SubCategoryID int     `json:"sub_category_id" validate:"required"`
 }
 
 type ForecastResponseFromFlask struct {
@@ -30,10 +31,10 @@ type ForecastResponseFromFlask struct {
 }
 
 type ForecastResult struct {
-	Month     int     `json:"month"`
-	Year      int     `json:"year"`
-	ProductID int     `json:"product_id"`
-	Result    float64 `json:"result"`
+	Month         int     `json:"month"`
+	Year          int     `json:"year"`
+	SubCategoryID int     `json:"sub_category_id"`
+	Result        float64 `json:"result"`
 }
 
 func (fr *ForecastResponseFromFlask) FromJSON(r io.Reader) error {

@@ -101,7 +101,7 @@ CREATE TABLE order_details(
 );
 
 create table roles(
-	id int not null,
+	id int not null auto_increment,
 	name text,
 	primary key(id)
 );

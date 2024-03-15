@@ -129,5 +129,7 @@ create table users(
 	foreign key (role_id) references roles(id) on delete cascade on update cascade
 );
 
+insert into roles(name) values ("admin","super_admin");
+
 insert into users(id,username, first_name, last_name, email, password, role_id)
 values ("9655eaa8-69b8-4b7b-85fd-b4e4d942109c","admin","Super","Admin","koreshiromaru@gmail.com","pHZml64fpGLOgemmSxpCZWZvbfq9CA7uv8Q9pmuKsF0=", 2);

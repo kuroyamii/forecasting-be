@@ -8,6 +8,7 @@ import (
 	"forecasting-be/pkg/utilities"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-playground/validator"
 	"github.com/gorilla/mux"
@@ -96,40 +97,19 @@ func (ac authController) handleInviteAdmin(rw http.ResponseWriter, r *http.Reque
 
 // handleRefreshToken handles logic to refresh the access token with refresh token
 func (ac authController) handleRefreshToken(rw http.ResponseWriter, r *http.Request) {
-	// Initialize empty struct
-	var refreshTokenRequest dto.RefreshRequest
-	// Decode request body
-	err := utilities.JSONDecode(r.Body, &refreshTokenRequest)
+	storedCookie, err := r.Cookie("jwt")
 	if err != nil {
-		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
 		rw.WriteHeader(http.StatusBadRequest)
-		baseResponse.NewBaseResponse(http.StatusBadRequest,
-			http.StatusText(http.StatusBadRequest),
-			baseResponse.ErrorResponse{
-				Key:   "parsing error",
-				Value: err.Error(),
-			},
-			nil).ToJSON(rw)
+		baseResponse.NewBaseResponse(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), err.Error(), nil).ToJSON(rw)
 		return
 	}
-	// Validate request body
-	validate := validator.New()
-	err = validate.Struct(refreshTokenRequest)
-	if err != nil {
-		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
+	if storedCookie == nil || storedCookie.Value == "" {
 		rw.WriteHeader(http.StatusBadRequest)
-		baseResponse.NewBaseResponse(http.StatusBadRequest,
-			http.StatusText(http.StatusBadRequest),
-			baseResponse.ErrorResponse{
-				Key:   "validation error",
-				Value: err.Error(),
-			},
-			nil).ToJSON(rw)
+		baseResponse.NewBaseResponse(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), "no token", nil).ToJSON(rw)
 		return
 	}
-
 	// Regenerate access token
-	res, err := ac.as.RegenerateToken(r.Context(), refreshTokenRequest.RefreshToken)
+	res, err := ac.as.RegenerateToken(r.Context(), storedCookie.Value)
 	if err != nil {
 		log.Printf("%v %v\n", utilities.Red("ERROR"), err.Error())
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -142,13 +122,25 @@ func (ac authController) handleRefreshToken(rw http.ResponseWriter, r *http.Requ
 			nil).ToJSON(rw)
 		return
 	}
+	cookie := &http.Cookie{}
+	cookie.Name = "jwt"
+	cookie.Value = res.RefreshToken
+	tokenEnv := utilities.GetTokenEnv()
+	cookie.Expires = time.Now().Add(time.Hour * time.Duration(tokenEnv.RefreshTokenTTLHour))
+	cookie.HttpOnly = true
+	cookie.Path = "/"
+	cookie.SameSite = 4
+	cookie.Secure = true
+	http.SetCookie(rw, cookie)
 
 	// Send success response
 	rw.WriteHeader(http.StatusOK)
 	baseResponse.NewBaseResponse(http.StatusOK,
 		http.StatusText(http.StatusOK),
 		nil,
-		res).ToJSON(rw)
+		dto.AccessTokenOnlyResponse{
+			AccessToken: res.AccessToken,
+		}).ToJSON(rw)
 }
 
 // handleSignIn handles logic for signing in user
@@ -207,13 +199,26 @@ func (ac authController) handleSignIn(rw http.ResponseWriter, r *http.Request) {
 			nil).ToJSON(rw)
 		return
 	}
-
+	cookie := &http.Cookie{}
+	cookie.Name = "jwt"
+	cookie.Path = "/"
+	cookie.Value = res.RefreshToken
+	tokenEnv := utilities.GetTokenEnv()
+	cookie.Expires = time.Now().Add(time.Hour * time.Duration(tokenEnv.RefreshTokenTTLHour))
+	cookie.HttpOnly = true
+	cookie.SameSite = 4
+	cookie.Secure = true
+	http.SetCookie(rw, cookie)
 	// Send success response
 	rw.WriteHeader(http.StatusOK)
+	accessToken := dto.AccessTokenOnlyResponse{
+		AccessToken: res.AccessToken,
+	}
+
 	baseResponse.NewBaseResponse(http.StatusOK,
 		http.StatusText(http.StatusOK),
 		nil,
-		res).ToJSON(rw)
+		accessToken).ToJSON(rw)
 }
 
 // handleSignUp handles logic for signing up invited admins

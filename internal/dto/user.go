@@ -27,3 +27,7 @@ type AdminRequest struct {
 	Email string `json:"email" validate:"email,required"`
 	Role  string `json:"role" validate:"required"`
 }
+
+type AccessTokenOnlyResponse struct {
+	AccessToken string `json:"access_token" validate:"required"`
+}
